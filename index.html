@@ -218,6 +218,29 @@
       flex-shrink: 0;
     }
 
+    .btn-group { display: inline-flex; gap: 0.5rem; }
+
+    .reset-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0.38em 0.85em;
+      cursor: pointer;
+      transition: background 0.14s, border-color 0.14s, color 0.14s;
+    }
+
+    .reset-btn:hover  { color: #8b2e18; border-color: rgba(139,46,24,.35); background: rgba(139,46,24,.06); }
+    .reset-btn:active { background: rgba(139,46,24,.12); }
+
     /* ─── NOTES LIST ──────────────────────────────── */
     .notes-list {
       list-style: none;
@@ -323,12 +346,15 @@
 
     <div class="toolbar">
       <span class="entry-count">Entries &thinsp;<strong id="note-count">0</strong></span>
-      <button class="download-btn" id="download-btn" title="Export notes as JSON">
-        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 1v7M3 6l3 3 3-3M1 10h10"/>
-        </svg>
-        Export JSON
-      </button>
+      <div class="btn-group">
+        <button class="download-btn" id="download-btn" title="Export notes as JSON">
+          <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 1v7M3 6l3 3 3-3M1 10h10"/>
+          </svg>
+          Export JSON
+        </button>
+        <button class="reset-btn" id="reset-btn" title="Clear all notes">Reset</button>
+      </div>
     </div>
 
     <ol class="notes-list" id="notes-list">
@@ -443,6 +469,22 @@
       for (let i = notes.length - 1; i >= 0; i--) prependNote(notes[i]);
       updateCount();
     }
+
+    // ── Reset ──────────────────────────────────────────────────────────────
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (!notes.length) return;
+      if (!window.confirm('Clear all entries? This cannot be undone.')) return;
+      notes = [];
+      persist();
+      notesList.innerHTML = '';
+      const li = document.createElement('li');
+      li.className = 'empty-li';
+      li.id = 'empty-li';
+      li.innerHTML = '<span class="empty-msg">No entries yet — start writing above.</span>';
+      notesList.appendChild(li);
+      updateCount();
+      textarea.focus();
+    });
 
     // ── Export ─────────────────────────────────────────────────────────────
     downloadBtn.addEventListener('click', () => {
